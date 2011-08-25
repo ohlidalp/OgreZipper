@@ -40,7 +40,7 @@ ________________________________________________________________________________
 
 __author__ = 'Petr Ohlidal'
 __version__ = '1.0'
-__url__ = 'no webpage yet'
+__url__ = 'https://github.com/An00biS/OgreZipper'
 __email__ = 'An00biS@An00biS.cz'
 
 
@@ -567,7 +567,6 @@ for zipInfo in zipsToCreate:
 					twosidedPass = True;
 			elif "}" in matLine:
 				tabCount = matLine.count("\t")+1;
-				echo("} insidePass:" + str(insidePass) + ", insideTextureUnit:" + str(insideTextureUnit));
 				if insideTextureUnit:
 					insideTextureUnit = False;
 				elif insidePass:
