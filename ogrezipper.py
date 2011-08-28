@@ -625,9 +625,20 @@ for zipInfo in zipsToCreate:
 			for texPath in meshInfo.texturePaths:
 				echo ("\t\tTexture: "+texPath)
 				zipStream.write(texPath, meshInfo.name+"/"+os.path.basename(texPath))
+
+		# Shared textures
+		if len(zipInfo.getSharedTextures()):
+			echo("\tShared textures")
 		for texAbsPath in zipInfo.getSharedTextures():
-			zipStream.write(texAbsPath, SHARED_TEXTURES_DIR_NAME+os.path.basename(texAbsPath))
+			stTargetPath = SHARED_TEXTURES_DIR_NAME + "/" + os.path.basename(texAbsPath)
+			echo("\t\t" + stTargetPath)
+			zipStream.write(texAbsPath, stTargetPath)
+
+		# Extras
+		if len(zipInfo.getExtras()):
+			echo("\tExtras")
 		for extraFile in zipInfo.getExtras():
+			echo("\t\t" + extraFile.getTargetPath())
 			zipStream.write(extraFile.getSourcePath(), extraFile.getTargetPath())
 		zipStream.close()
 
