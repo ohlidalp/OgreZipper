@@ -162,6 +162,9 @@ class ProjectZip:
 	def getMeshes(self):
 		return self.meshes
 
+	def addExtra(self, extra):
+		self.extras.add(extra)
+
 	def getExtras(self):
 		return self.extras
 
