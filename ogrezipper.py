@@ -172,10 +172,10 @@ class ProjectZip:
 		return self.path
 
 	def addSharedTexture(self, path):
-		self.sharedTextures.add(path)
+		self.sharedTextures.add(path.strip())
 
-	def isSharedTexture(self, path):
-		return path in self.sharedTextures
+	def isTextureShared(self, path):
+		return path.strip() in self.sharedTextures
 
 	def getSharedTextures(self):
 		return self.sharedTextures
@@ -198,7 +198,7 @@ class ProjectMesh:
 		return self.meshXmlPath
 
 	def setMaterialFilePath(self, matFilePath):
-		self.materialPath = matFilePath
+		self.materialPath = os.path.abspath(matFilePath)
 
 	def getMaterialFilePath(self):
 		return self.materialPath
@@ -482,7 +482,7 @@ for zipInfo in zipsToCreate:
 		except IOError:
 			echo("ERROR: Can't open "+meshInfo.getMaterialFilePath()+", exit.")
 			sys.exit(1)
-		texBasePath = os.path.split(meshInfo.getMaterialFilePath())[0]
+		texBasePath = os.path.dirname(meshInfo.getMaterialFilePath())
 		texPattern = re.compile(r'texture\s+',  re.I)
 		while(True):
 			line = matStream.readline()
@@ -531,7 +531,7 @@ for zipInfo in zipsToCreate:
 		#sections = Stack();
 		texAlphaPass = False;
 		twosidedPass = False;
-		texBasePath = os.path.split(meshInfo.materialPath)[0]
+		texBasePath = os.path.dirname(meshInfo.getMaterialFilePath());
 		insidePass = False;
 		insideTextureUnit = False;
 		while True:
@@ -541,10 +541,10 @@ for zipInfo in zipsToCreate:
 				break
 			# Process the line
 			if "material" in matLine:
-				matOutput += "material "+fixGeneratedMatName(meshInfo.name, matLine+'\n');
+				matOutput += "material " + fixGeneratedMatName(meshInfo.name, matLine + "\n")
 			elif "pass" in matLine:
-				insidePass = True;
-				matOutput+=matLine
+				insidePass = True
+				matOutput += matLine
 				continue
 			elif "texture_unit" in matLine:
 				insideTextureUnit = True;
@@ -558,10 +558,10 @@ for zipInfo in zipsToCreate:
 				texPath = matLine[lastSpace+1:].strip()
 				texAbsPath = os.path.join(texBasePath, texPath)
 				matOutput+='\t'*tabCount+"texture "
-				if zipInfo.isSharedTexture(texAbsPath):
-					matOutput+=SHARED_TEXTURES_DIR_NAME+"/"+texPath+"\n";
+				if zipInfo.isTextureShared(texAbsPath):
+					matOutput += SHARED_TEXTURES_DIR_NAME + "/" + texPath + "\n";
 				else:
-					matOutput+=meshInfo.name+"/"+texPath+'\n';
+					matOutput += meshInfo.name + "/" + texPath + "\n";
 					meshInfo.addTexturePath(texAbsPath);
 				texFileLower = texPath.lower();
 				if "alpha" in texFileLower:
@@ -632,7 +632,7 @@ for zipInfo in zipsToCreate:
 		for texAbsPath in zipInfo.getSharedTextures():
 			stTargetPath = SHARED_TEXTURES_DIR_NAME + "/" + os.path.basename(texAbsPath)
 			echo("\t\t" + stTargetPath)
-			zipStream.write(texAbsPath, stTargetPath)
+			zipStream.write(texAbsPath.strip(), stTargetPath.strip())
 
 		# Extras
 		if len(zipInfo.getExtras()):
